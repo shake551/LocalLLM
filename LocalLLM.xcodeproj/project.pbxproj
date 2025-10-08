@@ -256,6 +256,9 @@
 				DEVELOPMENT_TEAM = TJ5Q4VG5ZF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "ローカルネットワーク上のLLMサーバーに接続するために使用します。";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "このアプリは音声文字起こし機能でマイクを使用して音声を録音し、テキストに変換します。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "このアプリは音声をテキストに変換する文字起こし機能を提供するために音声認識を使用します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +291,9 @@
 				DEVELOPMENT_TEAM = TJ5Q4VG5ZF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "ローカルネットワーク上のLLMサーバーに接続するために使用します。";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "このアプリは音声文字起こし機能でマイクを使用して音声を録音し、テキストに変換します。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "このアプリは音声をテキストに変換する文字起こし機能を提供するために音声認識を使用します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
