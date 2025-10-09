@@ -27,7 +27,7 @@ struct HomeView: View {
                         FeatureCard(
                             icon: "message.fill",
                             title: "チャット",
-                            description: "AIとテキストでチャット",
+                            description: "Apple Intelligence搭載チャット",
                             color: .blue
                         )
                     }
@@ -47,7 +47,7 @@ struct HomeView: View {
                 
                 Spacer()
                 
-                Text("Powered by Ollama")
+                Text("Apple Intelligence & Ollama対応")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.bottom)

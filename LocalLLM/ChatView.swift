@@ -85,11 +85,60 @@ struct ChatView: View {
         .navigationTitle("Local LLM Chat")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("クリア") {
-                    viewModel.clearChat()
+            ToolbarItem(placement: .navigationBarLeading) {
+                HStack {
+                    if viewModel.llmService.isUsingLocalLLM {
+                        if viewModel.llmService.isAppleIntelligenceAvailable {
+                            Image(systemName: "brain.head.profile")
+                                .foregroundColor(.purple)
+                            Text("Apple AI")
+                                .font(.caption)
+                                .foregroundColor(.purple)
+                        } else {
+                            Image(systemName: "iphone")
+                                .foregroundColor(.green)
+                            Text("ローカル")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        }
+                    } else {
+                        Image(systemName: "cloud")
+                            .foregroundColor(.blue)
+                        Text("リモート")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                    }
                 }
-                .disabled(viewModel.messages.isEmpty)
+                .animation(.easeInOut(duration: 0.3), value: viewModel.llmService.isUsingLocalLLM)
+                .animation(.easeInOut(duration: 0.3), value: viewModel.llmService.isAppleIntelligenceAvailable)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    // Apple Intelligence状態表示
+                    if viewModel.llmService.isUsingLocalLLM {
+                        Label("Apple Intelligence: \(viewModel.llmService.appleIntelligenceStatus)", 
+                              systemImage: viewModel.llmService.isAppleIntelligenceAvailable ? "brain.head.profile" : "exclamationmark.triangle")
+                            .foregroundColor(viewModel.llmService.isAppleIntelligenceAvailable ? .purple : .orange)
+                        
+                        Divider()
+                    }
+                    
+                    Button(action: {
+                        viewModel.llmService.toggleLLMMode()
+                    }) {
+                        Label("LLMモード切替", systemImage: viewModel.llmService.isUsingLocalLLM ? "cloud" : "iphone")
+                    }
+                    
+                    Divider()
+                    
+                    Button("チャットをクリア") {
+                        viewModel.clearChat()
+                    }
+                    .disabled(viewModel.messages.isEmpty)
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
             }
         }
     }

@@ -9,7 +9,17 @@ class ChatViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
-    private let llmService = LLMService()
+    @ObservedObject var llmService = LLMService()
+    private var cancellables = Set<AnyCancellable>()
+    
+    init() {
+        // LLMServiceの状態変化を監視
+        llmService.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
     
     func sendMessage() async {
         guard !currentInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
