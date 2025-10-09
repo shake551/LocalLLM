@@ -25,10 +25,10 @@ struct HomeView: View {
                 VStack(spacing: 20) {
                     NavigationLink(destination: ChatView()) {
                         FeatureCard(
-                            icon: "message.fill",
-                            title: "チャット",
-                            description: "Apple Intelligence搭載チャット",
-                            color: .blue
+                            icon: "brain.head.profile",
+                            title: "Apple Intelligence Chat",
+                            description: "オンデバイスAIチャット",
+                            color: .purple
                         )
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -57,7 +57,7 @@ struct HomeView: View {
                 
                 Spacer()
                 
-                Text("Apple Intelligence & Ollama対応")
+                Text("Apple Intelligence 完全オンデバイス")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.bottom)

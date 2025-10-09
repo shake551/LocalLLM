@@ -1,58 +1,36 @@
 # LocalLLM
 
-ローカルLLMを使用したiOSチャットアプリです。Ollamaを使用してローカル環境でAIモデルと対話できます。
+iOS 26の Apple Intelligence Foundation Model を使用した完全オンデバイスAIアシスタントアプリです。
 
 ## 概要
 
 このアプリは以下の機能を提供します：
 
-- 📱 SwiftUIベースのモダンなチャットインターフェース
-- 🤖 Ollama経由でのローカルLLMとの対話
-- 💬 リアルタイムメッセージ表示
-- 📝 会話履歴の保持
-- 🎤 **音声文字起こし機能** - 音声をリアルタイムでテキストに変換
-- ✨ **AI文章改善** - 音声認識結果をLLMで自動的に読みやすく整理
-- 🏠 **ホーム画面** - チャットと文字起こし機能への簡単アクセス
-- ⚡ 高速なローカル処理（インターネット接続不要）
+- 🧠 **Apple Intelligence Chat** - Foundation Model による高品質なAI会話
+- 🎤 **音声文字起こし** - 音声をリアルタイムでテキストに変換
+- 👁️ **Visual Intelligence** - 画像の AI 分析とオブジェクト検出
+- 📱 SwiftUIベースのモダンなインターフェース
+- 🔒 **完全プライベート** - すべての処理がデバイス上で実行
+- ⚡ **ネットワーク接続不要** - 完全オフライン動作
+- 🏠 **統合ホーム画面** - 全機能への簡単アクセス
 
 ## 必要要件
 
-- **Xcode 16.0** 以上
-- **iOS 26.0** 以上（シミュレーター対応）
-- **macOS** (Ollamaサーバー用)
-- **Homebrew** (Ollamaインストール用)
+- **Xcode 26.0** 以上
+- **iOS 26.0** 以上
+- **Apple Intelligence対応デバイス** (A17 Pro以上のチップまたはApple Silicon Mac)
+- **Apple Intelligence有効化** (設定 → Apple Intelligence & Siri)
 
 ## セットアップ手順
 
-### 1. Ollamaのインストール
+### 1. Apple Intelligenceの設定
 
-```bash
-# Homebrewを使用してOllamaをインストール
-brew install ollama
-brew services start ollama
-```
+1. **設定アプリ** を開く
+2. **Apple Intelligence & Siri** に移動
+3. **Apple Intelligence** をオンにする
+4. 利用規約に同意し、セットアップを完了
 
-### 2. LLMモデルのダウンロード
-
-```bash
-# 軽量モデル（推奨）
-ollama pull llama3.2:1b
-
-# または他のモデル（より高性能だが重い）
-ollama pull llama3.2:3b
-ollama pull llama3.2:7b
-```
-
-### 3. Ollamaサーバーの起動
-
-```bash
-# Ollamaサーバーを起動（ポート11434で実行）
-ollama serve
-```
-
-**注意**: Ollamaサーバーは常に起動させておく必要があります。新しいターミナルウィンドウで実行することをお勧めします。
-
-### 4. プロジェクトのビルドと実行
+### 2. プロジェクトのビルドと実行
 
 ```bash
 # プロジェクトディレクトリに移動
@@ -65,100 +43,139 @@ open LocalLLM.xcodeproj
 xcodebuild -project LocalLLM.xcodeproj -scheme LocalLLM -destination 'platform=iOS Simulator,name=iPhone 17' build
 ```
 
+## 機能詳細
+
+### 🧠 Apple Intelligence Chat
+
+- **Foundation Model**: iOS 26の30億パラメータオンデバイスモデル
+- **自然な会話**: 事前定義レスポンスなしの本格的なAI対話
+- **言語自動検出**: 日本語・英語に自動対応
+- **会話履歴**: セッション内での文脈保持
+- **完全プライベート**: データが端末を離れることなし
+
+### 🎤 音声文字起こし
+
+- **リアルタイム認識**: 話している内容をリアルタイムで表示
+- **高精度変換**: iOS Speech Recognitionによる高品質な音声認識
+- **自動保存**: 認識結果の自動保存機能
+- **履歴管理**: 過去の文字起こし結果を一覧表示
+- **コピー機能**: ワンタップでクリップボードにコピー
+
+### 👁️ Visual Intelligence
+
+- **画像分析**: カメラまたはフォトライブラリからの画像分析
+- **オブジェクト検出**: 画像内のオブジェクト自動識別
+- **テキスト認識**: 画像内のテキスト抽出（OCR）
+- **シーン分類**: 画像の内容・場面の自動分類
+- **顔検出**: 画像内の顔の検出と位置特定
+
 ## 使用方法
 
-### 基本操作
+### Apple Intelligence Chat
 
-1. **アプリを起動**: Xcodeからシミュレーターでアプリを実行
-2. **メッセージ入力**: 画面下部の入力フィールドにメッセージを入力
-3. **送信**: 紙飛行機アイコンをタップまたはEnterキーで送信
-4. **AI応答**: しばらく待つとAIからの返答が表示されます
+1. ホーム画面から **「Apple Intelligence Chat」** をタップ
+2. 画面下部の入力フィールドにメッセージを入力
+3. 送信ボタンをタップまたはEnterキーで送信
+4. Foundation Modelからの応答を待つ
 
-### 機能
+### 音声文字起こし
 
-- **チャットクリア**: 右上の「クリア」ボタンで会話履歴をリセット
-- **エラー表示**: 接続エラーなどが発生した場合、画面上部に赤いエラーメッセージが表示
-- **ローディング表示**: AI処理中は「考え中...」のメッセージが表示
+1. ホーム画面から **「音声文字起こし」** をタップ
+2. **「録音開始」** ボタンをタップ
+3. マイクに向かって話す
+4. **「録音停止」** ボタンで終了
+5. 認識結果が自動的に保存される
 
-## 設定とカスタマイズ
+### Visual Intelligence
 
-### モデルの変更
-
-`LLMService.swift` の24行目でモデル名を変更できます：
-
-```swift
-let request = ChatRequest(
-    model: "llama3.2:1b",  // ここを変更
-    messages: messages,
-    stream: false
-)
-```
-
-利用可能なモデル：
-- `llama3.2:1b` - 高速、軽量（推奨）
-- `llama3.2:3b` - バランス型
-- `llama3.2:7b` - 高性能、重い
-
-### サーバーURLの変更
-
-`LLMService.swift` の5行目でOllamaサーバーのURLを変更できます：
-
-```swift
-private let baseURL = "http://localhost:11434"  // ここを変更
-```
+1. ホーム画面から **「Visual Intelligence」** をタップ
+2. **「カメラ」** で撮影、または **「写真選択」** で既存画像を選択
+3. 自動的に画像分析が実行される
+4. **「AI詳細分析」** で Foundation Model による詳細解説
 
 ## トラブルシューティング
 
-### よくある問題
+### Apple Intelligence関連
 
-1. **「リクエストが失敗しました」エラー**
-   - Ollamaサーバーが起動しているか確認: `ollama serve`
-   - ポート11434が使用されていないか確認
+1. **「AI機能が利用できません」エラー**
+   - Apple Intelligence が有効化されているか確認
+   - 対応デバイス（A17 Pro以上）を使用しているか確認
+   - iOS 26がインストールされているか確認
 
-2. **「モデルが見つかりません」エラー**
-   - モデルがダウンロードされているか確認: `ollama list`
-   - 必要に応じてモデルを再ダウンロード: `ollama pull llama3.2:1b`
+2. **「Apple Intelligenceが無効」表示**
+   - 設定 → Apple Intelligence & Siri → Apple Intelligence をオンにする
+   - デバイスの再起動を試す
 
-3. **ビルドエラー**
-   - Xcodeが最新バージョンか確認
-   - Derived Dataをクリア: Xcode → Product → Clean Build Folder
+3. **「デバイス非対応」表示**
+   - A17 Pro以上のチップを搭載したデバイスが必要
+   - Apple Silicon Macでは利用可能
 
-### ログの確認
+### 音声認識関連
 
-```bash
-# Ollamaのログを確認
-ollama logs
+1. **マイクアクセス許可**
+   - 設定 → プライバシーとセキュリティ → マイク → LocalLLM をオンにする
 
-# 利用可能なモデルを確認
-ollama list
+2. **音声認識許可**
+   - 設定 → プライバシーとセキュリティ → 音声認識 → LocalLLM をオンにする
 
-# Ollamaサーバーの状態を確認
-curl http://localhost:11434/api/tags
-```
+### Visual Intelligence関連
+
+1. **カメラアクセス許可**
+   - 設定 → プライバシーとセキュリティ → カメラ → LocalLLM をオンにする
 
 ## 技術仕様
 
 ### アーキテクチャ
 
-- **UI**: SwiftUI + Combine
-- **ネットワーク**: URLSession + async/await
-- **LLM**: Ollama REST API
-- **最小iOS**: 26.0
-- **言語**: Swift 5.0
+- **UI Framework**: SwiftUI + Combine
+- **AI Engine**: Apple Intelligence Foundation Models
+- **Image Processing**: Vision + VisionKit
+- **Speech**: Speech Recognition + AVFoundation
+- **Language Detection**: Natural Language
+- **Minimum iOS**: 26.0
+- **Language**: Swift 5.0
+
+### Apple Intelligence統合
+
+- **FoundationModels Framework**: iOS 26の新フレームワーク
+- **SystemLanguageModel**: Apple の30億パラメータモデル
+- **LanguageModelSession**: 会話セッション管理
+- **完全オンデバイス**: ネットワーク通信なし
 
 ### ファイル構成
 
 ```
 LocalLLM/
-├── LocalLLMApp.swift      # アプリエントリーポイント
-├── ContentView.swift      # メインビュー
-├── ChatView.swift         # チャットインターフェース
-├── ChatViewModel.swift    # チャット状態管理
-├── MessageView.swift      # メッセージ表示コンポーネント
-├── Message.swift          # メッセージデータモデル
-├── LLMService.swift       # Ollama API通信
-└── Assets.xcassets/       # アプリリソース
+├── LocalLLMApp.swift              # アプリエントリーポイント
+├── ContentView.swift              # メインビュー
+├── HomeView.swift                 # ホーム画面
+├── ChatView.swift                 # Apple Intelligence チャット
+├── ChatViewModel.swift            # チャット状態管理
+├── TranscriptionView.swift        # 音声文字起こしUI
+├── TranscriptionViewModel.swift   # 文字起こし状態管理
+├── VisualIntelligenceView.swift   # Visual Intelligence UI
+├── VisualIntelligenceService.swift # 画像分析サービス
+├── CameraView.swift              # カメラ機能
+├── SpeechRecognitionService.swift # 音声認識サービス
+├── MessageView.swift             # メッセージ表示コンポーネント
+├── Message.swift                 # メッセージデータモデル
+├── LLMService.swift              # Apple Intelligence API
+└── Assets.xcassets/              # アプリリソース
 ```
+
+## プライバシーとセキュリティ
+
+### 完全オンデバイス処理
+
+- **データ外部送信なし**: すべての処理がデバイス内で完結
+- **ネットワーク通信なし**: インターネット接続は一切不要
+- **プライバシー保護**: 会話内容・音声・画像が外部に送信されない
+
+### 権限管理
+
+- **マイク**: 音声文字起こし機能でのみ使用
+- **カメラ**: Visual Intelligence機能でのみ使用
+- **写真**: 画像選択時のみアクセス
 
 ## ライセンス
 

@@ -82,7 +82,7 @@ struct ChatView: View {
             }
             .padding()
         }
-        .navigationTitle("Local LLM Chat")
+        .navigationTitle("Apple Intelligence Chat")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -94,23 +94,18 @@ struct ChatView: View {
                             .font(.caption)
                             .foregroundColor(.purple)
                     } else {
-                        Image(systemName: "wifi.slash")
-                            .foregroundColor(.green)
-                        Text("オフライン")
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundColor(.orange)
+                        Text("AI利用不可")
                             .font(.caption)
-                            .foregroundColor(.green)
+                            .foregroundColor(.orange)
                     }
                 }
-                .animation(.easeInOut(duration: 0.3), value: viewModel.llmService.isUsingLocalLLM)
                 .animation(.easeInOut(duration: 0.3), value: viewModel.llmService.isAppleIntelligenceAvailable)
             }
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
-                    // オフライン専用モード表示
-                    Label("オフライン専用モード", systemImage: "wifi.slash")
-                        .foregroundColor(.green)
-                    
                     // Apple Intelligence状態表示
                     Label("Apple Intelligence: \(viewModel.llmService.appleIntelligenceStatus)", 
                           systemImage: viewModel.llmService.isAppleIntelligenceAvailable ? "brain.head.profile" : "exclamationmark.triangle")
