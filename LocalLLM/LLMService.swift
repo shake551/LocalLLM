@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import NaturalLanguage
 import CoreML
+import FoundationModels
 
 class LLMService: ObservableObject {
     @Published var serverURL: String = ""
@@ -28,47 +29,33 @@ class LLMService: ObservableObject {
     
     @MainActor
     private func checkAppleIntelligenceAvailability() async {
-        // iOS 26+ でApple Intelligenceの利用可能性をチェック
-        if #available(iOS 18.0, *) {
-            // デバイスがApple Intelligenceをサポートしているかチェック
-            let isSupported = await isAppleIntelligenceSupported()
-            
-            if isSupported {
+        // iOS 26+ でApple Intelligence Foundation Modelsの利用可能性をチェック
+        if #available(iOS 26.0, *) {
+            // Apple Intelligence Foundation Model APIの利用可能性をチェック
+            switch SystemLanguageModel.default.availability {
+            case .available:
                 appleIntelligenceStatus = "利用可能"
                 isAppleIntelligenceAvailable = true
-            } else {
-                appleIntelligenceStatus = "このデバイスでは利用不可"
+            case .unavailable(let reason):
+                let message = switch reason {
+                case .appleIntelligenceNotEnabled:
+                    "Apple Intelligenceが無効"
+                case .deviceNotEligible:
+                    "デバイス非対応"
+                case .modelNotReady:
+                    "モデル準備中"
+                @unknown default:
+                    "利用不可"
+                }
+                appleIntelligenceStatus = message
                 isAppleIntelligenceAvailable = false
             }
         } else {
-            appleIntelligenceStatus = "iOS 18+が必要"
+            appleIntelligenceStatus = "iOS 26+が必要"
             isAppleIntelligenceAvailable = false
         }
     }
     
-    private func isAppleIntelligenceSupported() async -> Bool {
-        // Apple Intelligenceの利用可能性を確認
-        // iOS 26では、A17 Pro以上のチップまたはM1以上のMacが必要
-        
-        #if targetEnvironment(simulator)
-        // シミュレーターでは常に利用可能とする
-        return true
-        #else
-        // 実機でのApple Intelligence利用可能性をチェック
-        // iOS 26のAPIを使用してデバイス機能を確認
-        
-        // iOS標準のProcessInfo.processInfo.processorCountを使用してチップ性能を推定
-        let processorCount = ProcessInfo.processInfo.processorCount
-        let physicalMemory = ProcessInfo.processInfo.physicalMemory
-        
-        // A17 Pro以上のチップは8コア以上、8GB以上のRAMが一般的
-        // これは大まかな推定でありより正確な判定には別のAPIが必要
-        let hasHighPerformanceProcessor = processorCount >= 6
-        let hasSufficientMemory = physicalMemory >= 6_000_000_000 // 6GB
-        
-        return hasHighPerformanceProcessor && hasSufficientMemory
-        #endif
-    }
     
     
     struct ChatRequest: Codable {
@@ -88,126 +75,59 @@ class LLMService: ObservableObject {
     }
     
     func testConnection() async -> Bool {
-        if isUsingLocalLLM {
-            // ローカルLLMは常に利用可能
-            await MainActor.run {
-                self.isConnected = true
-            }
-            return true
-        }
-        
-        guard let url = URL(string: "\(baseURL)/api/tags") else {
-            return false
-        }
-        
-        var urlRequest = URLRequest(url: url)
-        urlRequest.timeoutInterval = 5.0
-        
-        do {
-            let (_, response) = try await URLSession.shared.data(for: urlRequest)
-            if let httpResponse = response as? HTTPURLResponse {
-                let connected = httpResponse.statusCode == 200
-                await MainActor.run {
-                    self.isConnected = connected
-                }
-                return connected
-            }
-        } catch {
-            print("接続テストエラー: \(error.localizedDescription)")
-        }
-        
+        // オフライン専用モード：常にローカル接続成功を返す
         await MainActor.run {
-            self.isConnected = false
+            self.isConnected = true
         }
-        return false
+        return true
     }
     
     func sendMessage(_ userMessage: String, conversationHistory: [Message]) async throws -> String {
         // Apple Intelligence Foundation Modelが利用可能な場合はそちらを使用
-        if isUsingLocalLLM && isAppleIntelligenceAvailable {
+        if #available(iOS 26.0, *), isUsingLocalLLM && isAppleIntelligenceAvailable {
             return try await sendToAppleIntelligence(userMessage: userMessage, conversationHistory: conversationHistory)
         }
         
-        // Ollamaサーバーに送信
-        guard let url = URL(string: "\(baseURL)/api/chat") else {
-            throw LLMError.invalidURL
-        }
-        
-        var messages: [ChatMessage] = []
-        
-        for message in conversationHistory {
-            let role = message.isUser ? "user" : "assistant"
-            messages.append(ChatMessage(role: role, content: message.content))
-        }
-        
-        messages.append(ChatMessage(role: "user", content: userMessage))
-        
-        let request = ChatRequest(
-            model: "llama3.2:1b",
-            messages: messages,
-            stream: false
-        )
-        
-        var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.httpBody = try JSONEncoder().encode(request)
-        urlRequest.timeoutInterval = 30.0
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(for: urlRequest)
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw LLMError.requestFailed
-            }
-            
-            if httpResponse.statusCode != 200 {
-                print("HTTP エラー: \(httpResponse.statusCode)")
-                if httpResponse.statusCode == 404 {
-                    throw LLMError.modelNotFound
-                }
-                throw LLMError.requestFailed
-            }
-            
-            let chatResponse = try JSONDecoder().decode(ChatResponse.self, from: data)
-            return chatResponse.message.content
-        } catch let error as LLMError {
-            throw error
-        } catch {
-            print("ネットワークエラー: \(error.localizedDescription)")
-            throw LLMError.networkError(error.localizedDescription)
-        }
+        // Apple Intelligence利用不可の場合はエラーとして処理
+        throw LLMError.requestFailed
     }
     
-    @available(iOS 18.0, *)
+    @available(iOS 26.0, *)
     private func sendToAppleIntelligence(userMessage: String, conversationHistory: [Message]) async throws -> String {
+        // Apple Intelligence Foundation Model（完全オンデバイス処理）
+        
         // 言語検出
         let tagger = NLTagger(tagSchemes: [.language])
         tagger.string = userMessage
         let (languageTag, _) = tagger.tag(at: userMessage.startIndex, unit: .paragraph, scheme: .language)
         let detectedLanguage = languageTag?.rawValue ?? "en"
         
-        // Processing time simulation for Foundation Model
-        let processingTime = UInt64.random(in: 1_500_000_000...3_000_000_000) // 1.5-3秒
-        try await Task.sleep(nanoseconds: processingTime)
-        
-        // 言語に応じてメッセージを調整
-        let finalMessage = if detectedLanguage == "ja" {
-            "以下の質問に日本語で答えてください：\(userMessage)"
+        // 言語に応じた指示文
+        let instructions = if detectedLanguage == "ja" {
+            "あなたは親切で知識豊富なAIアシスタントです。質問に対して正確で役立つ回答を日本語で提供してください。"
         } else {
-            userMessage
+            "You are a helpful and knowledgeable AI assistant. Provide accurate and helpful responses in English."
         }
         
-        // 実際のApple Intelligence APIが利用できない場合、
-        // Ollamaサーバーにフォールバックする
-        throw LLMError.requestFailed
+        // Apple Intelligence Foundation Model APIを使用
+        let session = LanguageModelSession(
+            model: SystemLanguageModel.default,
+            instructions: instructions
+        )
+        
+        // 会話履歴をセッションに追加（最新10件のみ）
+        for message in conversationHistory.suffix(10) {
+            if message.isUser {
+                _ = try await session.respond(to: message.content)
+            }
+        }
+        
+        // ユーザーメッセージを直接Apple Intelligence Foundation Modelに送信
+        let response = try await session.respond(to: userMessage)
+        return response.content
     }
     
     
-    func toggleLLMMode() {
-        isUsingLocalLLM.toggle()
-        print("LLMモード切替: \(isUsingLocalLLM ? "ローカル" : "リモート")")
-    }
 }
 
 
@@ -223,7 +143,7 @@ enum LLMError: Error, LocalizedError {
         case .invalidURL:
             return "無効なURLです"
         case .requestFailed:
-            return "サーバーへの接続に失敗しました。実機の場合は、MacのIPアドレスが正しく設定されているか確認してください。"
+            return "AI機能が利用できません。Apple Intelligence Foundation Modelが利用可能なデバイスで再度お試しください。"
         case .decodingError:
             return "レスポンスの解析に失敗しました"
         case .networkError(let message):

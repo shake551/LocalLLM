@@ -87,26 +87,18 @@ struct ChatView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
-                    if viewModel.llmService.isUsingLocalLLM {
-                        if viewModel.llmService.isAppleIntelligenceAvailable {
-                            Image(systemName: "brain.head.profile")
-                                .foregroundColor(.purple)
-                            Text("Apple AI")
-                                .font(.caption)
-                                .foregroundColor(.purple)
-                        } else {
-                            Image(systemName: "iphone")
-                                .foregroundColor(.green)
-                            Text("ローカル")
-                                .font(.caption)
-                                .foregroundColor(.green)
-                        }
-                    } else {
-                        Image(systemName: "cloud")
-                            .foregroundColor(.blue)
-                        Text("リモート")
+                    if viewModel.llmService.isAppleIntelligenceAvailable {
+                        Image(systemName: "brain.head.profile")
+                            .foregroundColor(.purple)
+                        Text("Apple AI")
                             .font(.caption)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.purple)
+                    } else {
+                        Image(systemName: "wifi.slash")
+                            .foregroundColor(.green)
+                        Text("オフライン")
+                            .font(.caption)
+                            .foregroundColor(.green)
                     }
                 }
                 .animation(.easeInOut(duration: 0.3), value: viewModel.llmService.isUsingLocalLLM)
@@ -115,20 +107,14 @@ struct ChatView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
-                    // Apple Intelligence状態表示
-                    if viewModel.llmService.isUsingLocalLLM {
-                        Label("Apple Intelligence: \(viewModel.llmService.appleIntelligenceStatus)", 
-                              systemImage: viewModel.llmService.isAppleIntelligenceAvailable ? "brain.head.profile" : "exclamationmark.triangle")
-                            .foregroundColor(viewModel.llmService.isAppleIntelligenceAvailable ? .purple : .orange)
-                        
-                        Divider()
-                    }
+                    // オフライン専用モード表示
+                    Label("オフライン専用モード", systemImage: "wifi.slash")
+                        .foregroundColor(.green)
                     
-                    Button(action: {
-                        viewModel.llmService.toggleLLMMode()
-                    }) {
-                        Label("LLMモード切替", systemImage: viewModel.llmService.isUsingLocalLLM ? "cloud" : "iphone")
-                    }
+                    // Apple Intelligence状態表示
+                    Label("Apple Intelligence: \(viewModel.llmService.appleIntelligenceStatus)", 
+                          systemImage: viewModel.llmService.isAppleIntelligenceAvailable ? "brain.head.profile" : "exclamationmark.triangle")
+                        .foregroundColor(viewModel.llmService.isAppleIntelligenceAvailable ? .purple : .orange)
                     
                     Divider()
                     
