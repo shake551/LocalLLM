@@ -42,6 +42,16 @@ struct HomeView: View {
                         )
                     }
                     .buttonStyle(PlainButtonStyle())
+                    
+                    NavigationLink(destination: VisualIntelligenceView()) {
+                        FeatureCard(
+                            icon: "eye.fill",
+                            title: "Visual Intelligence",
+                            description: "画像をAIで分析",
+                            color: .purple
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 .padding(.horizontal)
                 
