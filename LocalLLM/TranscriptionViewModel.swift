@@ -5,11 +5,9 @@ import Combine
 @MainActor
 class TranscriptionViewModel: ObservableObject {
     @Published var transcriptions: [TranscriptionItem] = []
-    @Published var isProcessing = false
     @Published var errorMessage: String?
     
     private let speechService = SpeechRecognitionService()
-    private let llmService = LLMService()
     private var cancellables = Set<AnyCancellable>()
     
     init() {
@@ -84,35 +82,9 @@ class TranscriptionViewModel: ObservableObject {
         transcriptions.append(transcription)
         print("processTranscription: 新しい音声認識結果を自動保存: \(trimmedText)")
         
-        // LLMで要約や改善を行う（オプション）
-        Task {
-            await enhanceTranscription(transcription)
-        }
+        // 音声認識結果をそのまま保存（改善処理なし）
     }
     
-    private func enhanceTranscription(_ transcription: TranscriptionItem) async {
-        isProcessing = true
-        
-        do {
-            let prompt = """
-            以下の音声認識結果を、読みやすく整理してください。
-            句読点を適切に追加し、文章として自然になるように修正してください。
-            
-            音声認識結果:
-            \(transcription.originalText)
-            """
-            
-            let enhancedText = try await llmService.sendMessage(prompt, conversationHistory: [])
-            
-            if let index = transcriptions.firstIndex(where: { $0.id == transcription.id }) {
-                transcriptions[index].enhancedText = enhancedText
-            }
-        } catch {
-            errorMessage = "テキスト改善中にエラーが発生しました: \(error.localizedDescription)"
-        }
-        
-        isProcessing = false
-    }
     
     func clearTranscriptions() {
         transcriptions.removeAll()
@@ -146,11 +118,6 @@ class TranscriptionViewModel: ObservableObject {
         transcriptions.append(transcription)
         print("新しい音声認識結果を保存: \(trimmedText)")
         
-        // LLMで文章改善を実行
-        Task {
-            await enhanceTranscription(transcription)
-        }
-        
         // 保存後はリアルタイムテキストをクリア
         speechService.recognizedText = ""
     }
@@ -170,29 +137,22 @@ class TranscriptionViewModel: ObservableObject {
         )
         
         transcriptions.append(transcription)
-        
-        // デモではすぐにLLM改善を実行
-        Task {
-            await enhanceTranscription(transcription)
-        }
     }
 }
 
 struct TranscriptionItem: Identifiable, Codable {
     let id: UUID
     let originalText: String
-    var enhancedText: String?
     let timestamp: Date
     
     init(originalText: String, timestamp: Date) {
         self.id = UUID()
         self.originalText = originalText
-        self.enhancedText = nil
         self.timestamp = timestamp
     }
     
     var displayText: String {
-        return enhancedText ?? originalText
+        return originalText
     }
     
     var formattedTimestamp: String {

@@ -175,7 +175,6 @@ struct TranscriptionListView: View {
                 ForEach(viewModel.transcriptions) { transcription in
                     TranscriptionItemView(
                         transcription: transcription,
-                        isProcessing: viewModel.isProcessing,
                         onCopy: { text in
                             viewModel.copyToClipboard(text)
                         },
@@ -234,7 +233,6 @@ struct EmptyStateView: View {
 
 struct TranscriptionItemView: View {
     let transcription: TranscriptionItem
-    let isProcessing: Bool
     let onCopy: (String) -> Void
     let onDelete: () -> Void
     
@@ -246,28 +244,11 @@ struct TranscriptionItemView: View {
                     .foregroundColor(.secondary)
                 
                 Spacer()
-                
-                if transcription.enhancedText != nil {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                        .font(.caption)
-                } else if isProcessing {
-                    ProgressView()
-                        .scaleEffect(0.7)
-                }
             }
             
             Text(transcription.displayText)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
-            
-            // 改善前のテキストを表示（改善後がある場合）
-            if let enhancedText = transcription.enhancedText, enhancedText != transcription.originalText {
-                Text("元の音声認識: \(transcription.originalText)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .italic()
-            }
             
             HStack {
                 Button("コピー") {
